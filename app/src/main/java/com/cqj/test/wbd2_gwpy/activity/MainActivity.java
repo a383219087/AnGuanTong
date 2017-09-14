@@ -93,11 +93,11 @@ public class MainActivity extends Activity {
 						.show();
 				return;
 			}
-			if (!yzmStr.equalsIgnoreCase(yzm_)) {
-				Toast.makeText(MainActivity.this, "非法验证码！", Toast.LENGTH_LONG)
-						.show();
-				return;
-			}
+//			if (!yzmStr.equalsIgnoreCase(yzm_)) {
+//				Toast.makeText(MainActivity.this, "非法验证码！", Toast.LENGTH_LONG)
+//						.show();
+//				return;
+//			}
 			Editor edit = sp.edit();
 			edit.putBoolean(myApp.ISREM, isRemenber);
 			// 记住密码

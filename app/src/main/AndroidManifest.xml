@@ -159,7 +159,10 @@
             android:name=".activity.YhDetailActivity"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".activity.VideoActivity">
+        <activity
+            android:name=".activity.VideoPlayActivity"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         </activity>
     </application>
 

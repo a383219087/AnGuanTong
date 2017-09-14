@@ -1,24 +1,5 @@
 package com.cqj.test.wbd2_gwpy.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import com.cqj.test.wbd2_gwpy.R;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,6 +9,12 @@ import android.media.ThumbnailUtils;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * 图片下载工具类
  *
@@ -36,28 +23,6 @@ import android.util.Log;
 public class BitmapUtil {
     private static final String TAG = "BtimapUtil";
 
-    /**
-     * 根据网址获得图片，优先从本地获取，本地没有则从网络下载
-     *
-     * @param url     图片网址
-     * @param context 上下文
-     * @return 图片
-     */
-    public static HashMap<String, Object> getBitmap(String url, Context context) {
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        String imageName = url
-                .substring(url.lastIndexOf("/") + 1, url.length());
-        File file = new File(getPath(context), imageName);
-        if (file.exists()) {
-            map.put("path", file.getAbsolutePath());
-            map.put("bitmap",
-                    getImageThumbnail(file.getAbsolutePath(), 500, 400));
-            return map;
-        }
-        map.put("path", file.getAbsolutePath());
-        map.put("bitmap", getNetBitmap(url, file, context));
-        return map;
-    }
 
     /**
      * 获取图片的存储目录，在有sd卡的情况下为 “/sdcard/apps_images/本应用包名/cach/images/”
@@ -86,46 +51,6 @@ public class BitmapUtil {
         return file.getPath();
     }
 
-    /**
-     * 网络可用状态下，下载图片并保存在本地
-     *
-     * @param strUrl  图片网址
-     * @param file    本地保存的图片文件
-     * @param context 上下文
-     * @return 图片
-     */
-    private static Bitmap getNetBitmap(String strUrl, File file, Context context) {
-        Bitmap bitmap = null;
-        try {
-            HttpGet httpRequest = new HttpGet(strUrl);
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpResponse response = (HttpResponse) httpclient
-                    .execute(httpRequest);
-            HttpEntity entity = response.getEntity();
-            BufferedHttpEntity bufferedHttpEntity = new BufferedHttpEntity(
-                    entity);
-            InputStream is = bufferedHttpEntity.getContent();
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            FileOutputStream fos = new FileOutputStream(file);
-            int len = -1;
-            byte[] buffer = new byte[8960];
-            while ((len = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, len);
-            }
-            fos.flush();
-            fos.close();
-            bitmap = getImageThumbnail(file.getAbsolutePath(), 500, 400);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-
-        }
-        return bitmap;
-    }
 
     private static Bitmap getImageThumbnail(String imagePath, int width,
                                             int height) {

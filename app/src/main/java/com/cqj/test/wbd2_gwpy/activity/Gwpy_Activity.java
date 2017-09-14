@@ -1,16 +1,10 @@
 package com.cqj.test.wbd2_gwpy.activity;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import net.tsz.afinal.FinalBitmap;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -28,12 +22,17 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cqj.test.wbd2_gwpy.util.MyGetImageTask;
+import com.bumptech.glide.Glide;
+import com.cqj.test.wbd2_gwpy.R;
 import com.cqj.test.wbd2_gwpy.util.StringUtil;
 import com.cqj.test.wbd2_gwpy.util.TableParse;
 import com.cqj.test.wbd2_gwpy.util.WebServiceUtil;
 import com.cqj.test.wbd2_gwpy.view.SweetAlertDialog;
-import com.cqj.test.wbd2_gwpy.view.SweetAlertDialog.OnSweetClickListener;import com.cqj.test.wbd2_gwpy.R;
+import com.cqj.test.wbd2_gwpy.view.SweetAlertDialog.OnSweetClickListener;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class Gwpy_Activity extends Activity {
@@ -52,8 +51,6 @@ public class Gwpy_Activity extends Activity {
 	private HashMap<String, String> tableOrImageData;
 	private String comnameStr = "";
 	private LinearLayout gwpy_fjwd, gwpy_fjbg;
-	private FinalBitmap fBitmap;
-	private ArrayList<AsyncTask<String, String, HashMap<String, Object>>> taskList;
 
 	private Handler mHandler = new Handler(new Handler.Callback() {
 
@@ -147,13 +144,13 @@ public class Gwpy_Activity extends Activity {
 						String url = images[i].replace("../", "");
 						ImageView iv = new ImageView(Gwpy_Activity.this);
 						iv.setClickable(true);
-						iv.setImageResource(R.drawable.picture_load);
 						gwpy_fjwd.addView(iv);
-						MyGetImageTask task1 = new MyGetImageTask(
-								Gwpy_Activity.this,
-								WebServiceUtil.IMAGE_URLPATH + url, iv);
-						taskList.add(task1);
-						task1.execute();
+						String realUrl = WebServiceUtil.IMAGE_URLPATH + url;
+						Glide.with(Gwpy_Activity.this)
+								.load(realUrl)
+								.placeholder(R.drawable.picture_load)
+								.error(R.drawable.picture_load)
+								.into(iv);
 						iv.setOnClickListener(new OnClickListener() {
 
 							@Override
@@ -296,11 +293,6 @@ public class Gwpy_Activity extends Activity {
 		}
 		getActionBar().setTitle("公文信息传阅");
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		fBitmap = FinalBitmap.create(Gwpy_Activity.this);
-		fBitmap.configBitmapLoadThreadSize(3);
-		fBitmap.configDiskCachePath(getApplicationContext().getFilesDir()
-				.toString());
-		fBitmap.configDiskCacheSize(10 * 1024 * 1024);
 		title = (TextView) findViewById(R.id.gwpy_title);
 		gwfbsj = (TextView) findViewById(R.id.gwpy_fbsj);
 		cyrs = (TextView) findViewById(R.id.gwpy_cyrs);
@@ -312,8 +304,7 @@ public class Gwpy_Activity extends Activity {
 		remarkTv = (TextView) findViewById(R.id.gwpy_remark);
 		gwpy_fjwd = (LinearLayout) findViewById(R.id.gwpy_fjwd);
 		gwpy_fjbg = (LinearLayout) findViewById(R.id.gwpy_fjbg);
-		tableOrImageData = new HashMap<String, String>();
-		taskList = new ArrayList<AsyncTask<String, String, HashMap<String, Object>>>();
+		tableOrImageData = new HashMap<>();
 	}
 
 	public void commit_gw(View view) {
@@ -378,11 +369,6 @@ public class Gwpy_Activity extends Activity {
 		super.onDestroy();
 		if (myGetDataThread.isAlive()) {
 			myGetDataThread.interrupt();
-		}
-		for (int i = 0; i < taskList.size(); i++) {
-			if (!taskList.get(i).isCancelled()) {
-				taskList.get(i).cancel(true);
-			}
 		}
 	}
 
