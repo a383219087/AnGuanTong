@@ -60,6 +60,7 @@ public class VideoPlayActivity extends Activity {
         mSeekBar = (ProgressBar) findViewById(R.id.progressbar);
         mLlSeekbar = (LinearLayout) findViewById(R.id.seekbar_ll);
         initPlayEvent();
+        play();
     }
 
     private void initPlayEvent() {
@@ -71,13 +72,7 @@ public class VideoPlayActivity extends Activity {
                         mLivePlayer.pause();
                         mIvVideoPlay.setImageResource(R.drawable.social_view_video_start_normal);
                     } else {
-                        if (mProgress == 0) {
-                            mLivePlayer.startPlay(mUrl, TXLivePlayer.PLAY_TYPE_VOD_FLV);
-                            mProgress = SharedPreferenceUtil.getInt(VideoPlayActivity.this, mUrl);
-                            mLivePlayer.seek(mProgress);
-                        } else {
-                            mLivePlayer.resume();
-                        }
+                        play();
                     }
                 }else{
                     Toast.makeText(VideoPlayActivity.this, "播放器未准备就绪", Toast.LENGTH_SHORT).show();
@@ -101,6 +96,16 @@ public class VideoPlayActivity extends Activity {
                 }
             }
         });
+    }
+
+    private void play() {
+        if (mProgress == 0) {
+            mLivePlayer.startPlay(mUrl, TXLivePlayer.PLAY_TYPE_VOD_FLV);
+            mProgress = SharedPreferenceUtil.getInt(VideoPlayActivity.this, mUrl);
+            mLivePlayer.seek(mProgress);
+        } else {
+            mLivePlayer.resume();
+        }
     }
 
     private ITXLivePlayListener mPlayListener = new ITXLivePlayListener() {
