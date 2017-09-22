@@ -68,7 +68,7 @@ public class ClassDetailActivity extends Activity {
                     title.setText(StringUtil.noNull(mData.get(0).get("currTitle")));
                     yqks.setText(String.format("要求课时：%s", StringUtil.noNull(mData.get(0).get("currhour"))));
 //                    mUrl = StringUtil.noNull(mData.get(0).get("vlink"));
-                    mUrl = "http://www.chinasafety.org/Common/vcastr22/安全生产管理培训案例视频库之叉车事故.flv";
+                    mUrl = "http://1254347179.vod2.myqcloud.com/78ad040avodgzp1254347179/97908ec89031868223254458733/kSAqVeCt8bUA.mp4";
                     if (TextUtils.isEmpty(mUrl)) {
                         spckBtn.setVisibility(View.GONE);
                         changeBtnState(false);
@@ -240,7 +240,7 @@ public class ClassDetailActivity extends Activity {
                         mIvVideoPlay.setImageResource(R.drawable.social_view_video_start_normal);
                     } else {
                         if (mProgress == 0) {
-                            mLivePlayer.startPlay(mUrl, TXLivePlayer.PLAY_TYPE_VOD_FLV);
+                            mLivePlayer.startPlay(mUrl, TXLivePlayer.PLAY_TYPE_VOD_MP4);
                             mProgress = SharedPreferenceUtil.getInt(ClassDetailActivity.this, mUrl);
                             mLivePlayer.seek(mProgress);
                         } else {
