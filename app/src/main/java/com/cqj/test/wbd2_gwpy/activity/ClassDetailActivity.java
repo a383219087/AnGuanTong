@@ -56,6 +56,7 @@ public class ClassDetailActivity extends Activity {
     private String mUrl;
     private Chronometer mChron;
     private int mProgress;
+    private int mTotal;
 
     private Handler handler = new Handler(new Handler.Callback() {
 
@@ -68,7 +69,7 @@ public class ClassDetailActivity extends Activity {
                     title.setText(StringUtil.noNull(mData.get(0).get("currTitle")));
                     yqks.setText(String.format("要求课时：%s", StringUtil.noNull(mData.get(0).get("currhour"))));
 //                    mUrl = StringUtil.noNull(mData.get(0).get("vlink"));
-                    mUrl = "http://1254347179.vod2.myqcloud.com/78ad040avodgzp1254347179/97908ec89031868223254458733/kSAqVeCt8bUA.mp4";
+                    mUrl = "http://1254347179.vod2.myqcloud.com/2cd4a6b2vodtransgzp1254347179/999a8e989031868223254513500/v.f20.mp4";
                     if (TextUtils.isEmpty(mUrl)) {
                         spckBtn.setVisibility(View.GONE);
                         changeBtnState(false);
@@ -240,10 +241,11 @@ public class ClassDetailActivity extends Activity {
                         mIvVideoPlay.setImageResource(R.drawable.social_view_video_start_normal);
                     } else {
                         if (mProgress == 0) {
-                            mLivePlayer.startPlay(mUrl, TXLivePlayer.PLAY_TYPE_VOD_MP4);
+                            mLivePlayer.startPlay(mUrl, TXLivePlayer.PLAY_TYPE_VOD_FLV);
                             mProgress = SharedPreferenceUtil.getInt(ClassDetailActivity.this, mUrl);
                             mLivePlayer.seek(mProgress);
                         } else {
+                            mLivePlayer.seek(mProgress);
                             mLivePlayer.resume();
                         }
                     }
@@ -255,7 +257,7 @@ public class ClassDetailActivity extends Activity {
         mIvVideoToBig.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                VideoPlayActivity.startForResult(ClassDetailActivity.this, mUrl, mProgress, REQUEST_CODE);
+                VideoPlayActivity.startForResult(ClassDetailActivity.this, mUrl, mProgress, mTotal, REQUEST_CODE);
             }
         });
     }
@@ -348,9 +350,11 @@ public class ClassDetailActivity extends Activity {
                             Toast.LENGTH_LONG).show();
                     break;
                 case REQUEST_CODE:
+                    mLivePlayer.startPlay(mUrl,TXLivePlayer.PLAY_TYPE_VOD_FLV);
                     mProgress = data.getIntExtra(VideoPlayActivity.RESULT_PROGRESS, 0);
-                    mLivePlayer.seek(mProgress);
-                    mLivePlayer.resume();
+                    if(mProgress!=mTotal) {
+                        mLivePlayer.seek(mProgress);
+                    }
                     break;
 
                 default:
@@ -448,8 +452,12 @@ public class ClassDetailActivity extends Activity {
                 int duration = param.getInt(TXLiveConstants.EVT_PLAY_DURATION); //时间（秒数）
                 mSeekBar.setProgress(mProgress);
                 mSeekBar.setMax(duration);
+                mTotal = duration;
 //				mTextStart.setText(String.format("%2d:%2d", mProgress /60, mProgress %60));
 //				mTextDuration.setText(String.format("%2d:%2d",duration/60,duration%60));
+            }else if(event == TXLiveConstants.PLAY_EVT_PLAY_END){
+                SharedPreferenceUtil.putInt(ClassDetailActivity.this, mUrl, 0);
+                mProgress=0;
             }
         }
 
