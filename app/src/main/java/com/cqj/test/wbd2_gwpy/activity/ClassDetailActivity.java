@@ -68,8 +68,8 @@ public class ClassDetailActivity extends Activity {
                 case 1:
                     title.setText(StringUtil.noNull(mData.get(0).get("currTitle")));
                     yqks.setText(String.format("要求课时：%s", StringUtil.noNull(mData.get(0).get("currhour"))));
-//                    mUrl = StringUtil.noNull(mData.get(0).get("vlink"));
-                    mUrl = "http://1254347179.vod2.myqcloud.com/2cd4a6b2vodtransgzp1254347179/999a8e989031868223254513500/v.f20.mp4";
+                    mUrl = StringUtil.noNull(mData.get(0).get("vlink"));
+//                    mUrl = "http://1254347179.vod2.myqcloud.com/2cd4a6b2vodtransgzp1254347179/999a8e989031868223254513500/v.f20.mp4";
                     if (TextUtils.isEmpty(mUrl)) {
                         spckBtn.setVisibility(View.GONE);
                         changeBtnState(false);
