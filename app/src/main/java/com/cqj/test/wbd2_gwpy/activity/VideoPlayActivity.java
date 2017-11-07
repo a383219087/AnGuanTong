@@ -168,7 +168,7 @@ public class VideoPlayActivity extends Activity {
 
     private void showPreventAwaitDialog() {
         SweetAlertDialog alertDialog = new SweetAlertDialog(this,SweetAlertDialog.WARNING_TYPE);
-        alertDialog.setContentText("验证是否挂机，请点击确定");
+        alertDialog.setContentText("学习完成请点保存按钮才能记录学习时间");
         alertDialog.setTitleText("提示");
         alertDialog.setConfirmText("确定");
         alertDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
