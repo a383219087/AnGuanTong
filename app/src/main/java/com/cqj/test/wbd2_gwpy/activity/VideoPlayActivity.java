@@ -24,8 +24,10 @@ public class VideoPlayActivity extends Activity {
 
     private static final String EXTRA_KEY_URL = "key_url";
     private static final String EXTRA_KEY_PROGRESS = "key_progress";
+    public static final String EXTRA_KEY_TOTAL = "total";
     private String mUrl;
     private int mProgress;
+    private int mTotal;
     private TXCloudVideoView mVideoView;
     private TXLivePlayer mLivePlayer;
     private ImageView mIvVideoPlay;
@@ -43,6 +45,7 @@ public class VideoPlayActivity extends Activity {
     private void init() {
         mUrl = getIntent().getStringExtra(EXTRA_KEY_URL);
         mProgress = getIntent().getIntExtra(EXTRA_KEY_PROGRESS, 0);
+        mTotal = getIntent().getIntExtra(EXTRA_KEY_TOTAL,0);
         mVideoView = (TXCloudVideoView) findViewById(R.id.big_videoview);
         mLivePlayer = new TXLivePlayer(this);
         mLivePlayer.setRenderMode(TXLiveConstants.RENDER_MODE_ADJUST_RESOLUTION);
@@ -60,7 +63,8 @@ public class VideoPlayActivity extends Activity {
         mSeekBar = (ProgressBar) findViewById(R.id.progressbar);
         mLlSeekbar = (LinearLayout) findViewById(R.id.seekbar_ll);
         initPlayEvent();
-        play();
+        mLivePlayer.startPlay(mUrl, TXLivePlayer.PLAY_TYPE_VOD_FLV);
+        mLivePlayer.seek(mProgress);
     }
 
     private void initPlayEvent() {
@@ -82,6 +86,9 @@ public class VideoPlayActivity extends Activity {
         mIvVideoToBig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.putExtra(RESULT_PROGRESS,mProgress);
+                setResult(RESULT_OK,intent);
                 finish();
             }
         });
@@ -99,7 +106,7 @@ public class VideoPlayActivity extends Activity {
     }
 
     private void play() {
-        if (mProgress == 0) {
+        if (mProgress == 0 || mProgress >= mTotal) {
             mLivePlayer.startPlay(mUrl, TXLivePlayer.PLAY_TYPE_VOD_FLV);
             mProgress = SharedPreferenceUtil.getInt(VideoPlayActivity.this, mUrl);
             mLivePlayer.seek(mProgress);
@@ -124,6 +131,9 @@ public class VideoPlayActivity extends Activity {
                 int duration = param.getInt(TXLiveConstants.EVT_PLAY_DURATION); //时间（秒数）
                 mSeekBar.setProgress(mProgress);
                 mSeekBar.setMax(duration);
+            }else if(event == TXLiveConstants.PLAY_EVT_PLAY_END){
+                SharedPreferenceUtil.putInt(VideoPlayActivity.this, mUrl, 0);
+                mProgress=0;
             }
         }
 
@@ -138,9 +148,6 @@ public class VideoPlayActivity extends Activity {
         super.onDestroy();
         mLivePlayer.stopPlay(true); // true代表清除最后一帧画面
         mVideoView.onDestroy();
-        Intent intent = new Intent();
-        intent.putExtra(RESULT_PROGRESS,mProgress);
-        setResult(RESULT_OK,intent);
     }
 
     @Override
@@ -151,9 +158,17 @@ public class VideoPlayActivity extends Activity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent();
+        intent.putExtra(RESULT_PROGRESS,mProgress);
+        setResult(RESULT_OK,intent);
+    }
+
     private void showPreventAwaitDialog() {
         SweetAlertDialog alertDialog = new SweetAlertDialog(this,SweetAlertDialog.WARNING_TYPE);
-        alertDialog.setContentText("验证是否挂机，请点击确定");
+        alertDialog.setContentText("学习完成请点保存按钮才能记录学习时间");
         alertDialog.setTitleText("提示");
         alertDialog.setConfirmText("确定");
         alertDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
@@ -166,10 +181,11 @@ public class VideoPlayActivity extends Activity {
         alertDialog.show();
     }
 
-    public static void startForResult(Activity activity, String url, int progress, int requestCode) {
+    public static void startForResult(Activity activity, String url, int progress,int total, int requestCode) {
         Intent starter = new Intent(activity, VideoPlayActivity.class);
         starter.putExtra(EXTRA_KEY_URL, url);
         starter.putExtra(EXTRA_KEY_PROGRESS, progress);
+        starter.putExtra(EXTRA_KEY_TOTAL,total);
         activity.startActivityForResult(starter, requestCode);
     }
 }
