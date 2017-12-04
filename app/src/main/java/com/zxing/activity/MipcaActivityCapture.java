@@ -1,6 +1,8 @@
 package com.zxing.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
@@ -13,9 +15,6 @@ import android.os.Vibrator;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.cqj.test.wbd2_gwpy.R;
@@ -124,6 +123,18 @@ public class MipcaActivityCapture extends Activity implements Callback {
 		try {
 			CameraManager.get().openDriver(surfaceHolder);
 		} catch (IOException ioe) {
+			AlertDialog.Builder builder=new AlertDialog.Builder(this);
+			builder.setTitle("错误");
+			builder.setMessage("照相权限被禁止，无法使用该功能!");
+			builder.setCancelable(false);
+			builder.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+					finish();
+				}
+			});
+			builder.create().show();
 			return;
 		} catch (RuntimeException e) {
 			return;

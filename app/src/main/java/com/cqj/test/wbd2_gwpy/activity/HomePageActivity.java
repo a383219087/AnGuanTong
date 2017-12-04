@@ -20,12 +20,12 @@ import com.cqj.test.wbd2_gwpy.R;
 import com.cqj.test.wbd2_gwpy.SbjcCommitInfo;
 import com.cqj.test.wbd2_gwpy.UserInfoDao;
 import com.cqj.test.wbd2_gwpy.dao.SqliteOperator;
-import com.cqj.test.wbd2_gwpy.util.ArcProgress;
 import com.cqj.test.wbd2_gwpy.util.BitmapUtil;
 import com.cqj.test.wbd2_gwpy.util.StringUtil;
 import com.cqj.test.wbd2_gwpy.util.WebServiceUtil;
 import com.cqj.test.wbd2_gwpy.view.SweetAlertDialog;
 import com.cqj.test.wbd2_gwpy.view.SweetAlertDialog.OnSweetClickListener;
+import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,10 +33,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import de.greenrobot.dao.query.QueryBuilder;
+import rx.functions.Action1;
 
 
 public class HomePageActivity extends Activity implements OnClickListener {
@@ -197,7 +196,7 @@ public class HomePageActivity extends Activity implements OnClickListener {
         }).start();
     }
 
-    private static int getDayOfMonth(){
+    private static int getDayOfMonth() {
         Calendar aCalendar = Calendar.getInstance(Locale.CHINA);
         return aCalendar.getActualMaximum(Calendar.DATE);
     }
@@ -216,8 +215,20 @@ public class HomePageActivity extends Activity implements OnClickListener {
                         return;
                     }
                 }
-                intent = new Intent(HomePageActivity.this, Yhdj_Activity_V2.class);
-                startActivity(intent);
+                RxPermissions.getInstance(this)
+                        .request(android.Manifest.permission.CAMERA)
+                        .subscribe(new Action1<Boolean>() {
+                            @Override
+                            public void call(Boolean aBoolean) {
+                                if (aBoolean) {
+                                    Intent intent = new Intent(HomePageActivity.this, Yhdj_Activity_V2.class);
+                                    startActivity(intent);
+                                } else {
+                                    Toast.makeText(HomePageActivity.this, "无相机权限", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
                 break;
             case R.id.hp_gwxx:// 公文信息
                 if (!MyApplication.isConnection) {

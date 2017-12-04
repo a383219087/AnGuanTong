@@ -16,8 +16,6 @@
 
 package com.zxing.camera;
 
-import java.io.IOException;
-
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -27,6 +25,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
+
+import java.io.IOException;
 
 /**
  * This object wraps the Camera service object and expects to be the only one talking to it. The
@@ -117,7 +117,11 @@ public final class CameraManager {
    */
   public void openDriver(SurfaceHolder holder) throws IOException {
     if (camera == null) {
-      camera = Camera.open();
+      try {
+        camera = Camera.open();
+      } catch (Exception e) {
+        throw new IOException();
+      }
       if (camera == null) {
         throw new IOException();
       }
