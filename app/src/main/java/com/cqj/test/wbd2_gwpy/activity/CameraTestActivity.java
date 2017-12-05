@@ -17,13 +17,11 @@ import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cqj.test.wbd2_gwpy.R;
+import com.tbruyelle.rxpermissions.RxPermissions;
 
 import net.sourceforge.zbar.Config;
 import net.sourceforge.zbar.Image;
@@ -31,10 +29,11 @@ import net.sourceforge.zbar.ImageScanner;
 import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 
+import rx.functions.Action1;
+
 /* Import ZBar Class files */
 
-public class CameraTestActivity extends Activity
-{
+public class CameraTestActivity extends Activity {
     private Camera mCamera;
     private Handler autoFocusHandler;
 
@@ -44,7 +43,7 @@ public class CameraTestActivity extends Activity
 
     static {
         System.loadLibrary("iconv");
-    } 
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,25 +54,55 @@ public class CameraTestActivity extends Activity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         autoFocusHandler = new Handler();
-        mCamera = getCameraInstance();
+        if (!RxPermissions.getInstance(this)
+                .isGranted(android.Manifest.permission.CAMERA)) {
+            RxPermissions.getInstance(this)
+                    .request(android.Manifest.permission.CAMERA)
+                    .subscribe(new Action1<Boolean>() {
+                        @Override
+                        public void call(Boolean aBoolean) {
+                            if (aBoolean) {
+                                init();
+                            } else {
+                                Toast.makeText(CameraTestActivity.this, "无相机权限", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        }
+                    });
+            return;
+        }
+        init();
+    }
 
+    private void init() {
+        try {
+            mCamera = getCameraInstance();
+        } catch (Exception e) {
+        }
+
+        if(mCamera==null){
+            Toast.makeText(this, "无相机权限", Toast.LENGTH_SHORT).show();
+            finish();
+        }
         /* Instance barcode scanner */
         scanner = new ImageScanner();
         scanner.setConfig(0, Config.X_DENSITY, 3);
         scanner.setConfig(0, Config.Y_DENSITY, 3);
 
         CameraPreview preview1 = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
-        FrameLayout preview = (FrameLayout)findViewById(R.id.cameraPreview);
+        FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
         preview.addView(preview1);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mCamera.setPreviewCallback(previewCb);
-        mCamera.startPreview();
-        previewing = true;
-        mCamera.autoFocus(autoFocusCB);
+        if (mCamera != null) {
+            mCamera.setPreviewCallback(previewCb);
+            mCamera.startPreview();
+            previewing = true;
+            mCamera.autoFocus(autoFocusCB);
+        }
     }
 
     @Override
@@ -90,12 +119,15 @@ public class CameraTestActivity extends Activity
         releaseCamera();
     }
 
-    /** A safe way to get an instance of the Camera object. */
-    public static Camera getCameraInstance(){
+    /**
+     * A safe way to get an instance of the Camera object.
+     */
+    public static Camera getCameraInstance() throws Exception {
         Camera c = null;
         try {
             c = Camera.open();
-        } catch (Exception e){
+        } catch (Exception e) {
+            throw new Exception();
         }
         return c;
     }
@@ -110,46 +142,46 @@ public class CameraTestActivity extends Activity
     }
 
     private Runnable doAutoFocus = new Runnable() {
-            public void run() {
-                if (previewing)
-                    mCamera.autoFocus(autoFocusCB);
-            }
-        };
+        public void run() {
+            if (previewing)
+                mCamera.autoFocus(autoFocusCB);
+        }
+    };
 
     PreviewCallback previewCb = new PreviewCallback() {
-            public void onPreviewFrame(byte[] data, Camera camera) {
-                Parameters parameters = camera.getParameters();
-                Size size = parameters.getPreviewSize();
+        public void onPreviewFrame(byte[] data, Camera camera) {
+            Parameters parameters = camera.getParameters();
+            Size size = parameters.getPreviewSize();
 
-                Image barcode = new Image(size.width, size.height, "Y800");
-                barcode.setData(data);
+            Image barcode = new Image(size.width, size.height, "Y800");
+            barcode.setData(data);
 
-                int result = scanner.scanImage(barcode);
-                
-                if (result != 0) {
-                    previewing = false;
-                    mCamera.setPreviewCallback(null);
-                    mCamera.stopPreview();
-                    
-                    SymbolSet syms = scanner.getResults();
-                    String data1 = null;
-                    for (Symbol sym : syms) {
-                        data1 = sym.getData();
-                    }
-                    Intent resultIntent = new Intent();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("result", data1);
-                    resultIntent.putExtras(bundle);
-                    setResult(RESULT_OK, resultIntent);
-                    finish();
+            int result = scanner.scanImage(barcode);
+
+            if (result != 0) {
+                previewing = false;
+                mCamera.setPreviewCallback(null);
+                mCamera.stopPreview();
+
+                SymbolSet syms = scanner.getResults();
+                String data1 = null;
+                for (Symbol sym : syms) {
+                    data1 = sym.getData();
                 }
+                Intent resultIntent = new Intent();
+                Bundle bundle = new Bundle();
+                bundle.putString("result", data1);
+                resultIntent.putExtras(bundle);
+                setResult(RESULT_OK, resultIntent);
+                finish();
             }
-        };
+        }
+    };
 
     // Mimic continuous auto-focusing
     AutoFocusCallback autoFocusCB = new AutoFocusCallback() {
-            public void onAutoFocus(boolean success, Camera camera) {
-                autoFocusHandler.postDelayed(doAutoFocus, 1000);
-            }
-        };
+        public void onAutoFocus(boolean success, Camera camera) {
+            autoFocusHandler.postDelayed(doAutoFocus, 1000);
+        }
+    };
 }
