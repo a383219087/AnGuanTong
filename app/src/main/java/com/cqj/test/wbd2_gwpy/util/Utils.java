@@ -7,6 +7,7 @@ import android.os.StatFs;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +15,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -150,6 +153,89 @@ public class Utils {
         out.write(data, 0, data.length);
         out.flush();
         return jpgFile.getAbsolutePath();
+    }
+
+    public static String getExternalSdCardPath() {
+
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File sdCardFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+            return sdCardFile.getAbsolutePath();
+        }
+
+        String path = null;
+
+        File sdCardFile = null;
+
+        ArrayList<String> devMountList = getDevMountList();
+
+        for (String devMount : devMountList) {
+            File file = new File(devMount);
+
+            if (file.isDirectory() && file.canWrite()) {
+                path = file.getAbsolutePath();
+
+                String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
+                File testWritable = new File(path, "test_" + timeStamp);
+
+                if (testWritable.mkdirs()) {
+                    testWritable.delete();
+                } else {
+                    path = null;
+                }
+            }
+        }
+
+        if (path != null) {
+            sdCardFile = new File(path);
+            return sdCardFile.getAbsolutePath();
+        }
+
+        return null;
+    }
+
+    private static ArrayList<String> getDevMountList() {
+        String[] toSearch = readFile("/etc/vold.fstab").split(" ");
+        ArrayList<String> out = new ArrayList<String>();
+        for (int i = 0; i < toSearch.length; i++) {
+            if (toSearch[i].contains("dev_mount")) {
+                if (new File(toSearch[i + 2]).exists()) {
+                    out.add(toSearch[i + 2]);
+                }
+            }
+        }
+        return out;
+    }
+
+    public static String readFile(String filePath) {
+        String fileContent = "";
+        File file = new File(filePath);
+        if (file == null || !file.isFile()) {
+            return null;
+        }
+
+        BufferedReader reader = null;
+        try {
+            InputStreamReader is = new InputStreamReader(new FileInputStream(file));
+            reader = new BufferedReader(is);
+            String line = null;
+            int i = 0;
+            while ((line = reader.readLine()) != null) {
+                fileContent += line + " ";
+            }
+            reader.close();
+            return fileContent;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return fileContent;
     }
 
 }

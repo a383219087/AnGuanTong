@@ -2,12 +2,10 @@ package com.cqj.test.wbd2_gwpy.activity;
 
 import android.app.Application;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 
 import com.cqj.test.wbd2_gwpy.CompanyInfo;
-import com.cqj.test.wbd2_gwpy.DaoMaster;
-import com.cqj.test.wbd2_gwpy.DaoSession;
 import com.cqj.test.wbd2_gwpy.UserInfo;
+import com.cqj.test.wbd2_gwpy.util.CrashHandler;
 
 public class MyApplication extends Application {
 
@@ -55,6 +53,8 @@ public class MyApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		CrashHandler crashHandler = CrashHandler.getInstance() ;
+		crashHandler.init(this) ;
 	}
 
 	@Override
