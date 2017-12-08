@@ -21,6 +21,7 @@ import com.cqj.test.wbd2_gwpy.SbjcCommitInfo;
 import com.cqj.test.wbd2_gwpy.UserInfoDao;
 import com.cqj.test.wbd2_gwpy.dao.SqliteOperator;
 import com.cqj.test.wbd2_gwpy.util.BitmapUtil;
+import com.cqj.test.wbd2_gwpy.util.PermisionUtils;
 import com.cqj.test.wbd2_gwpy.util.StringUtil;
 import com.cqj.test.wbd2_gwpy.util.WebServiceUtil;
 import com.cqj.test.wbd2_gwpy.view.SweetAlertDialog;
@@ -51,6 +52,7 @@ public class HomePageActivity extends Activity implements OnClickListener {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.homepage_view);
+        PermisionUtils.verifyStoragePermissions(this);
         initComplement();
         geneItems();
     }
