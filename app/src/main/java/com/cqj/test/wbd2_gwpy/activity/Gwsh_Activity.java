@@ -250,12 +250,12 @@ public class Gwsh_Activity extends Activity {
 							"userId", "cType", "docTempId", "retstr" };
 					// System.out.println("orgidstr" +
 					// orgItem.get("Emid").toString());
-					Object values[] = { orgidStr, DocId, "",
+					Object values[] = { "", DocId, "",
 							"1900-01-01T00:00:00.850",
 							"2049-12-31T00:00:00.850", true, true, 0, "", 0, "" };
 					ArrayList<HashMap<String, Object>> data = WebServiceUtil
 							.getWebServiceMsg(keys, values,
-									"getCapacityDocument");
+									"getCapacityDocument",WebServiceUtil.HUIWEI_URL,WebServiceUtil.HUIWEI_NAMESPACE);
 					gwData.addAll(data);
 
 					// getAllEmployeeFromOrgID
@@ -264,7 +264,7 @@ public class Gwsh_Activity extends Activity {
 					ArrayList<HashMap<String, Object>> data3 = WebServiceUtil
 							.getWebServiceMsg(keys3, values3,
 									"getAllEmployeeFromOrgID", new String[] {
-											"emName", "Emid" });
+											"emName", "Emid" },WebServiceUtil.HUIWEI_URL,WebServiceUtil.HUIWEI_NAMESPACE);
 					gyData.addAll(data3);
 					mHandler.sendEmptyMessage(3);
 				} catch (InterruptedException ex) {
@@ -368,7 +368,7 @@ public class Gwsh_Activity extends Activity {
 							gyData.get(xygsh.getSelectedItemPosition()).get(
 									"Emid") };
 					WebServiceUtil.putWebServiceMsg(keys, values,
-							"SetInfoAudit");
+							"SetInfoAudit",WebServiceUtil.HUIWEI_URL,WebServiceUtil.HUIWEI_NAMESPACE);
 					mHandler.sendEmptyMessage(1);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -444,7 +444,7 @@ public class Gwsh_Activity extends Activity {
 							"carryPartName", "dLevel", "cDocDetailID",
 							"dSequence", "cDocDetail", "inTable", "inImage",
 							"createcom", "cDocDetail", "info_additional",
-							"info_additiondoc" });
+							"info_additiondoc" },WebServiceUtil.HUIWEI_URL,WebServiceUtil.HUIWEI_NAMESPACE);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

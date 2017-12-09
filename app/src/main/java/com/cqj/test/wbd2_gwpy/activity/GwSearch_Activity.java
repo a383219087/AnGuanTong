@@ -1,12 +1,5 @@
 package com.cqj.test.wbd2_gwpy.activity;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-
-import com.cqj.test.wbd2_gwpy.util.StringUtil;
-import com.cqj.test.wbd2_gwpy.util.WebServiceUtil;
-
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -25,7 +18,15 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;import com.cqj.test.wbd2_gwpy.R;
+import android.widget.Toast;
+
+import com.cqj.test.wbd2_gwpy.R;
+import com.cqj.test.wbd2_gwpy.util.StringUtil;
+import com.cqj.test.wbd2_gwpy.util.WebServiceUtil;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 
 
 public class GwSearch_Activity extends Activity {
@@ -97,7 +98,7 @@ public class GwSearch_Activity extends Activity {
 							Integer.parseInt(myApp.getComInfo().getOrg_id()),
 							"", false };
 					comData = WebServiceUtil.getWebServiceMsg(keys, values,
-							"getRelationOrg");
+							"getRelationOrg",WebServiceUtil.HUIWEI_URL,WebServiceUtil.HUIWEI_NAMESPACE);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

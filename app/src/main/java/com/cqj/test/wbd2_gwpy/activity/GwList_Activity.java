@@ -1,8 +1,5 @@
 package com.cqj.test.wbd2_gwpy.activity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -19,11 +16,15 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.cqj.test.wbd2_gwpy.R;
 import com.cqj.test.wbd2_gwpy.adapter.MyListAdapter;
 import com.cqj.test.wbd2_gwpy.util.StringUtil;
 import com.cqj.test.wbd2_gwpy.util.WebServiceUtil;
 import com.cqj.test.wbd2_gwpy.view.XListView;
-import com.cqj.test.wbd2_gwpy.view.XListView.IXListViewListener;import com.cqj.test.wbd2_gwpy.R;
+import com.cqj.test.wbd2_gwpy.view.XListView.IXListViewListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class GwList_Activity extends Activity implements IXListViewListener,
@@ -216,12 +217,13 @@ public class GwList_Activity extends Activity implements IXListViewListener,
 					// orgItem.get("Emid").toString());
 					Object values[] = {
 							Integer.parseInt(myApp.getComInfo().getEmid()),
-							100, 10, 0, false };
+							365, 50, 0, false };
 					data = WebServiceUtil.getWebServiceMsg(keys, values,
 							"getWebInformFroEmID", new String[] {
 									"NoAuditCount", "InfoTitle", "PubComname",
 									"PubDate", "AddCDocNamesStr",
-									"AddFilePathsStr", "CDocID", "InfoID" });
+									"AddFilePathsStr", "CDocID", "InfoID" },WebServiceUtil.HUIWEI_5VIN_URL,
+							WebServiceUtil.HUIWEI_NAMESPACE);
 
 					mHandler.sendEmptyMessage(1);
 				} catch (Exception e) {

@@ -1,8 +1,5 @@
 package com.cqj.test.wbd2_gwpy.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.MarshalFloat;
@@ -10,10 +7,14 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class WebServiceUtil {
 
 	public static final String WEBSERVICE_NAMESPACE = "http://wisebus.com/";
 	public static final String HUIWEI_URL ="http://www.huiweioa.com/5VCommon.asmx";
+	public static final String HUIWEI_5VIN_URL="http://www.huiweioa.com/5VInformPublish.asmx";
 	public static final String HUIWEI_NAMESPACE ="http://www.huiweioa.com/";
 	public static final String URL = "http://www.wisebus.com/5VCommon.asmx";
 	public static final String SAFE_URL = "http://www.wisebus.com/5VSafetyProduction.asmx";
@@ -21,7 +22,7 @@ public class WebServiceUtil {
 	public static final String PART_DUTY_URL = "http://www.wisebus.com/5VHumanResource.asmx";
 	public static final String putURL = "http://www.wisebus.com/5VInformPublish.asmx";
 	public static final String putWEBSERVICE_NAMESPACE = "http://tempuri.org/";
-	public static final String IMAGE_URLPATH = "http://www.chinasafety.org/";
+	public static final String IMAGE_URLPATH = "http://huiweioa.chinasafety.org/";
 
 	public static void putWebServiceMsg(String[] keys, Object[] values,
 			String methodName) throws Exception {
